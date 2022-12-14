@@ -1,0 +1,15 @@
+[submodule "util-linux"]
+	path = util-linux
+	url = https://github.com/util-linux/util-linux
+[submodule "emacs"]
+	path = emacs
+	url = https://github.com/emacs-mirror/emacs
+[submodule "linux"]
+	path = linux
+	url = https://github.com/torvalds/linux
+[submodule "ncurses"]
+	path = ncurses
+	url = https://github.com/mirror/ncurses
+[submodule "busybox"]
+	path = busybox
+	url = https://github.com/mirror/busybox
