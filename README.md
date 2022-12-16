@@ -12,8 +12,9 @@ $ ./make_emacs_rootfs.sh
 Emacs will complain about not being able to find tputs, unless a statically linked library of `ncurses` can be found
 ``` shellsession
 $ pushd ncurses
-$ ./configure CC=musl-gcc CXX=musl-gcc LDFLAGS=-static CFLAGS=-static
+$ ./configure CC=gcc CXX=gcc LDFLAGS=-static CFLAGS=-static --prefix=""
 $ make -j$(nproc)
+$ make DESTDIR=$PWD/build install
 $ popd
 ```
 
@@ -22,9 +23,10 @@ We need a statically compiled version of emacs if we want to keep the rootfs min
 
 ``` shellsession
 $ pushd emacs
-$ ./configure --with-json=no --without-x --without-libsystemd --without-gnutls --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../ncurses/build/include" LDFLAGS="-static -L$PWD/../ncurses/build/lib" CC=musl-gcc CXX=musl-gcc --prefix=/
+$ ./autogen.sh
+$ ./configure --with-json=no --without-x --without-libsystemd --without-gnutls --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../ncurses/build/include" LDFLAGS="-static -L$PWD/../ncurses/build/lib" CC=musl-gcc CXX=musl-gcc --prefix=""
 $ make -j$(nproc)
-$ make DESTDIR=$ROOTFS install
+$ sudo make DESTDIR=$ROOTFS_MNT install
 $ popd
 ```
 
@@ -67,5 +69,5 @@ $ sudo umount $ROOTFS_MNT
 # Launch Emacs-Os
 
 ``` shellsession
-$ uml ubd0=$ROOTFS init=/sbin/getty -i -n -l /sbin/emacs 0 /dev/tty0 vt100
+$ uml ubd0=$ROOTFS init=/sbin/getty -i -n -l /bin/emacs 0 /dev/tty0 linux
 ```
