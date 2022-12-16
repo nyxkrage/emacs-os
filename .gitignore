@@ -5,3 +5,4 @@ tmp/
 
 rootfs
 rootfs_mnt/
+shutdown/shutdown

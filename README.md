@@ -59,6 +59,14 @@ $ make install
 $ popd
 ```
 
+# Shutdown and Reboot utilities
+
+``` shellsession
+$ pushd shutdown
+$ gcc -static shutdown.c -o shutdown
+$ popd
+```
+
 # Finishing steps
 
 ``` shellsession
