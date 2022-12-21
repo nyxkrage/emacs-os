@@ -51,6 +51,7 @@
 
 ;; Add some standard directories to exec-path to use in eshell
 (setenv "PATH" "/bin:/sbin")
+(add-to-list 'load-path "/.emacs.d/")
 
 ;; Mount various needed virtual/tmp filesystem
 (call-process "/sbin/mount" nil "*log*" nil "-t" "proc" "proc" "/proc")
@@ -58,6 +59,11 @@
 (call-process "/sbin/mount" nil "*log*" nil "-t" "sysfs" "sys" "/sys")
 (call-process "/sbin/mount" nil "*log*" nil "-t" "tmpfs" "run" "/run")
 (call-process "/sbin/mount" nil "*log*" nil "-t" "devtmpfs" "dev" "/dev")
+
+(call-process "/bin/hostname" nil nil nil "emacs")
+
+(require 'ip)
+(assign-ip '(172 16 57 10) "ens33")
 
 (custom-set-variables
  '(inhibit-startup-screen t)

@@ -13,3 +13,6 @@
 [submodule "busybox"]
 	path = busybox
 	url = https://github.com/mirror/busybox
+[submodule "libxml2"]
+	path = libxml2
+	url = https://github.com/GNOME/libxml2.git

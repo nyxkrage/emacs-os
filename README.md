@@ -18,13 +18,23 @@ $ make DESTDIR=$PWD/build install
 $ popd
 ```
 
+## Statically compiled libxml2
+The Emacs web browser requires libxml2 to work
+
+``` shellsession
+$ pushd libxml2
+$ cmake -DBUILD_SHARED_LIBS=OFF -DLIBXML2_WITH_LZMA=OFF -DLIBXML2_WITH_ZLIB=OFF -DLIBXML_HTTP_ENABLED=OFF -DCMAKE_INSTALL_PREFIX:PATH=$PWD/build .
+$ sudo cmake --build . --target install
+$ popd libmxl2
+```
+
 ## Statically compiled Emacs
 We need a statically compiled version of emacs if we want to keep the rootfs minimal
 
 ``` shellsession
 $ pushd emacs
 $ ./autogen.sh
-$ ./configure --with-json=no --without-x --without-libsystemd --without-gnutls --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../ncurses/build/include" LDFLAGS="-static -L$PWD/../ncurses/build/lib" CC=musl-gcc CXX=musl-gcc --prefix=""
+$ ./configure --with-json=no --without-x --without-libsystemd --without-gnutls --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../ncurses/build/include -I$PWD/../libxml2/build/include/libxml2 -I$PWD/../zlib/build/include -I$PWD/../lzma/liblzma" LDFLAGS="-static -L$PWD/../ncurses/build/lib -L$PWD/../libxml2/build/lib -L$PWD/../zlib/build/lib -lpthread -lm -ldl" CC=musl-gcc CXX=musl-gcc --prefix=""
 $ make -j$(nproc)
 $ sudo make DESTDIR=$ROOTFS_MNT install
 $ popd
