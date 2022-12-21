@@ -16,3 +16,6 @@
 [submodule "libxml2"]
 	path = libxml2
 	url = https://github.com/GNOME/libxml2.git
+[submodule "gnutls"]
+	path = gnutls
+	url = https://github.com/gnutls/gnutls.git
