@@ -71,6 +71,10 @@
 
 (message "init done")
 
+(require 'catppuccin)
+
+(catppuccin-colors)
+
 (eshell)
 
 (provide 'init)
