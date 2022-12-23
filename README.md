@@ -28,13 +28,47 @@ $ sudo cmake --build . --target install
 $ popd 
 ```
 
+## Statically compiled nettle
+Nettle is a cryptograpy library used by gnutls
+
+``` shellsession
+$ pushd nettle
+$ ./configure CC=musl-gcc --prefix=$PWD/build --enable-static --disable-documentation --disable-shared --enable-mini-gmp
+$ make -j$(nproc)
+$ make install
+$ popd
+```
+
+## Statically compiled libev
+Libev is an event loop library required by gnutls
+
+``` shellsession
+$ pushd libev
+$ ./configure CC=musl-gcc CXX=musl-gcc --prefix=$PWD/build --enable-static --enable-shared=no
+$ make -j$(nproc)
+$ make install
+$ popd
+```
+
+## Statically compiled gnutls
+The Emacs web browser requires gnutls support to connect to https websites
+
+``` shellsession
+$ pushd gnutls
+$ ./bootstrap
+$ ./configure CC=musl-gcc NETTLE_CFLAGS="-I$PWD/../nettle/build/include" NETTLE_LIBS="-static -L$PWD/../nettle/build/lib64 -lhogweed -lnettle" HOGWEED_CFLAGS="-I$PWD/../nettle/build/include" HOGWEED_LIBS="-static -L$PWD/../nettle/build/lib64 -lhogweed -lnettle" LDFLAGS="-static -L$PWD/../nettle/build/lib64 -lhogweed -lnettle" CFLAGS="-I$PWD/../nettle/build/include" --with-libev-prefix="$PWD/../libev/build" --prefix=$PWD/build --enable-static --disable-shared --with-included-unistring --with-included-libtasn1 --disable-cxx --without-p11-kit --without-idn --disable-doc --disable-gost --with-nettle-mini
+$ make -j$(nproc)
+$ make install
+$ popd
+```
+
 ## Statically compiled Emacs
 We need a statically compiled version of emacs if we want to keep the rootfs minimal
 
 ``` shellsession
 $ pushd emacs
 $ ./autogen.sh
-$ ./configure --with-json=no --without-x --without-libsystemd --without-gnutls --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../ncurses/build/include -I$PWD/../libxml2/build/include/libxml2" LDFLAGS="-static -L$PWD/../ncurses/build/lib -L$PWD/../libxml2/build/lib -lpthread -lm -ldl" CC=musl-gcc CXX=musl-gcc --prefix=""
+$ ./configure --with-json=no --without-x --without-libsystemd --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../nettle/build/include -I$PWD/../ncurses/build/include -I$PWD/../libxml2/build/include/libxml2 -I$PWD/../gnutls/build/include" LDFLAGS="-static -L$PWD/../nettle/build/lib64  -L$PWD/../ncurses/build/lib -L$PWD/../libxml2/build/lib -L$PWD/../gnutls/build/lib -lnettle -lhogweed -lpthread -lm -ldl -lgnutls" CC=musl-gcc CXX=musl-gcc --prefix=""
 $ make -j$(nproc)
 $ sudo make DESTDIR=$ROOTFS_MNT install
 $ popd

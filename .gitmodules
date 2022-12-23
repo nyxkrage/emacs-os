@@ -19,3 +19,9 @@
 [submodule "gnutls"]
 	path = gnutls
 	url = https://github.com/gnutls/gnutls.git
+[submodule "nettle"]
+	path = nettle
+	url = https://github.com/gnutls/nettle.git
+[submodule "libev"]
+	path = libev
+	url = https://github.com/enki/libev.git
