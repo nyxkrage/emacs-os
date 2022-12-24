@@ -67,8 +67,9 @@ We need a statically compiled version of emacs if we want to keep the rootfs min
 
 ``` shellsession
 $ pushd emacs
+$ git apply ../patches/emacs/*.patch
 $ ./autogen.sh
-$ ./configure --with-json=no --without-x --without-libsystemd --with-sound=no --without-lcms2 --without-dbus CFLAGS="-static -O3 -I$PWD/../nettle/build/include -I$PWD/../ncurses/build/include -I$PWD/../libxml2/build/include/libxml2 -I$PWD/../gnutls/build/include" LDFLAGS="-static -L$PWD/../nettle/build/lib64  -L$PWD/../ncurses/build/lib -L$PWD/../libxml2/build/lib -L$PWD/../gnutls/build/lib -lnettle -lhogweed -lpthread -lm -ldl -lgnutls" CC=musl-gcc CXX=musl-gcc --prefix=""
+$ ./configure --with-json=no --without-x --without-libsystemd --with-sound=no --without-lcms2 --without-dbus CFLAGS="-O3 -I$PWD/../ncurses/build/include" LIBGNUTLS_CFLAGS="-I$PWD/../nettle/build/include -I$PWD/../gnutls/build/include" LIBXML2_CFLAGS="-I$PWD/../libxml2/build/include/libxml2" LDFLAGS="-static -L$PWD/../ncurses/build/lib" LIBXML2_LIBS="-static -L$PWD/../libxml2/build/lib -lxml2" LIBGNUTLS_LIBS="-static -L$PWD/../nettle/build/lib64 -L$PWD/../gnutls/build/lib -lgnutls -lhogweed -lnettle" CC=musl-gcc CXX=musl-gcc --prefix=""
 $ make -j$(nproc)
 $ sudo make DESTDIR=$ROOTFS_MNT install
 $ popd
