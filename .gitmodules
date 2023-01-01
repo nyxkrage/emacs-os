@@ -25,3 +25,6 @@
 [submodule "libev"]
 	path = libev
 	url = https://github.com/enki/libev.git
+[submodule "ffmpeg"]
+	path = ffmpeg
+	url = https://github.com/zimbatm/ffmpeg-static

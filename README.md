@@ -112,6 +112,17 @@ $ gcc -static shutdown.c -o shutdown
 $ popd
 ```
 
+# Statically compiled ffmpeg
+This allows the ability to record the framebuffer and to stream to twitch
+
+``` shellsession
+$ pushd twitch
+$ git apply ../patches/ffmpeg/*.patch
+$ ./build.sh -j$(nproc)
+$ popd
+```
+
+
 # Finishing steps
 
 ``` shellsession

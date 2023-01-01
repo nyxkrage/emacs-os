@@ -11,3 +11,6 @@ sudo cp -r ncurses/build/share/terminfo/ "$ROOTFS_MNT/share/"
 sudo cp -r .emacs.d "$ROOTFS_MNT/"
 sudo cp shutdown/shutdown "$ROOTFS_MNT/sbin/shutdown"
 sudo ln -s shutdown "$ROOTFS_MNT/sbin/reboot"
+if [ -e "./ffmpeg/bin/ffmpeg" ]; then
+    sudo cp ffmpeg/bin/ffmpeg "$ROOTFS_MNT/bin/ffmpeg"
+fi
