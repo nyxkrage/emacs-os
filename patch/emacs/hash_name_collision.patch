@@ -1,0 +1,402 @@
+diff --git a/src/ChangeLog.12 b/src/ChangeLog.12
+index f455c4de38..633e7e6c4e 100644
+--- a/src/ChangeLog.12
++++ b/src/ChangeLog.12
+@@ -3220,7 +3220,7 @@
+ 
+ 2012-11-08  Paul Eggert  <eggert@cs.ucla.edu>
+ 
+-	Use same hash function for hashfn_profiler as for hash_string etc.
++	Use same hash function for hashfn_profiler as for lisp_hash_string etc.
+ 	* fns.c (SXHASH_COMBINE): Remove.  All uses replaced by sxhash_combine.
+ 	* lisp.h (sxhash_combine): New inline function, with the contents
+ 	of the old SXHASH_COMBINE.
+diff --git a/src/bytecode.c b/src/bytecode.c
+index c765e1be2b..4f2aee81ac 100644
+--- a/src/bytecode.c
++++ b/src/bytecode.c
+@@ -1701,7 +1701,7 @@ #define DEFINE(name, value) [name] = &&insn_ ## name,
+ 		    break;
+               }
+             else
+-              i = hash_lookup (h, v1, NULL);
++              i = lisp_hash_lookup (h, v1, NULL);
+ 
+ 	    if (i >= 0)
+ 	      {
+diff --git a/src/category.c b/src/category.c
+index bedde0de45..396a33ae29 100644
+--- a/src/category.c
++++ b/src/category.c
+@@ -56,7 +56,7 @@ hash_get_category_set (Lisp_Object table, Lisp_Object category_set)
+ 			Qnil, false));
+   struct Lisp_Hash_Table *h = XHASH_TABLE (XCHAR_TABLE (table)->extras[1]);
+   Lisp_Object hash;
+-  ptrdiff_t i = hash_lookup (h, category_set, &hash);
++  ptrdiff_t i = lisp_hash_lookup (h, category_set, &hash);
+   if (i >= 0)
+     return HASH_KEY (h, i);
+   hash_put (h, category_set, Qnil, hash);
+diff --git a/src/ccl.c b/src/ccl.c
+index 1a4f73500a..3496685225 100644
+--- a/src/ccl.c
++++ b/src/ccl.c
+@@ -1372,7 +1372,7 @@ #define EXCMD (field1 >> 6)
+ 
+ 		eop = (FIXNUM_OVERFLOW_P (reg[RRR])
+ 		       ? -1
+-		       : hash_lookup (h, make_fixnum (reg[RRR]), NULL));
++		       : lisp_hash_lookup (h, make_fixnum (reg[RRR]), NULL));
+ 		if (eop >= 0)
+ 		  {
+ 		    Lisp_Object opl;
+@@ -1401,7 +1401,7 @@ #define EXCMD (field1 >> 6)
+ 
+ 		eop = (FIXNUM_OVERFLOW_P (i)
+ 		       ? -1
+-		       : hash_lookup (h, make_fixnum (i), NULL));
++		       : lisp_hash_lookup (h, make_fixnum (i), NULL));
+ 		if (eop >= 0)
+ 		  {
+ 		    Lisp_Object opl;
+diff --git a/src/charset.c b/src/charset.c
+index bb59262fe9..de8789c328 100644
+--- a/src/charset.c
++++ b/src/charset.c
+@@ -1107,7 +1107,7 @@ DEFUN ("define-charset-internal", Fdefine_charset_internal,
+   CHECK_LIST (args[charset_arg_plist]);
+   ASET (attrs, charset_plist, args[charset_arg_plist]);
+ 
+-  charset.hash_index = hash_lookup (hash_table, args[charset_arg_name],
++  charset.hash_index = lisp_hash_lookup (hash_table, args[charset_arg_name],
+ 				    &hash_code);
+   if (charset.hash_index >= 0)
+     {
+diff --git a/src/charset.h b/src/charset.h
+index 4f4a14f1bd..4a9fc6c7e7 100644
+--- a/src/charset.h
++++ b/src/charset.h
+@@ -286,7 +286,7 @@ #define CHARSET_SYMBOL_ID(symbol)	\
+ /* Return an index to Vcharset_hash_table of the charset whose symbol
+    is SYMBOL.  */
+ #define CHARSET_SYMBOL_HASH_INDEX(symbol)	\
+-  hash_lookup (XHASH_TABLE (Vcharset_hash_table), symbol, NULL)
++  lisp_hash_lookup (XHASH_TABLE (Vcharset_hash_table), symbol, NULL)
+ 
+ /* Return the attribute vector of CHARSET.  */
+ #define CHARSET_ATTRIBUTES(charset)	\
+diff --git a/src/coding.h b/src/coding.h
+index d86c17d18b..605874ad1c 100644
+--- a/src/coding.h
++++ b/src/coding.h
+@@ -193,7 +193,7 @@ #define CODING_SYSTEM_SPEC(coding_system_symbol)	\
+ /* Return the ID of CODING_SYSTEM_SYMBOL.  */
+ 
+ #define CODING_SYSTEM_ID(coding_system_symbol)			\
+-  hash_lookup (XHASH_TABLE (Vcoding_system_hash_table),		\
++  lisp_hash_lookup (XHASH_TABLE (Vcoding_system_hash_table),		\
+ 	       coding_system_symbol, NULL)
+ 
+ /* Return true if CODING_SYSTEM_SYMBOL is a coding system.  */
+diff --git a/src/composite.c b/src/composite.c
+index 6b256171ac..5e3d6cf514 100644
+--- a/src/composite.c
++++ b/src/composite.c
+@@ -240,7 +240,7 @@ get_composition_id (ptrdiff_t charpos, ptrdiff_t bytepos, ptrdiff_t nchars,
+   else
+     goto invalid_composition;
+ 
+-  hash_index = hash_lookup (hash_table, key, &hash_code);
++  hash_index = lisp_hash_lookup (hash_table, key, &hash_code);
+   if (hash_index >= 0)
+     {
+       /* We have already registered the same composition.  Change PROP
+@@ -643,7 +643,7 @@ compose_text (ptrdiff_t start, ptrdiff_t end, Lisp_Object components,
+ composition_gstring_lookup_cache (Lisp_Object header)
+ {
+   struct Lisp_Hash_Table *h = XHASH_TABLE (gstring_hash_table);
+-  ptrdiff_t i = hash_lookup (h, header, NULL);
++  ptrdiff_t i = lisp_hash_lookup (h, header, NULL);
+ 
+   return (i >= 0 ? HASH_VALUE (h, i) : Qnil);
+ }
+diff --git a/src/emacs-module.c b/src/emacs-module.c
+index 35d6e9e0d7..64b8d68c82 100644
+--- a/src/emacs-module.c
++++ b/src/emacs-module.c
+@@ -426,7 +426,7 @@ module_make_global_ref (emacs_env *env, emacs_value value)
+   MODULE_FUNCTION_BEGIN (NULL);
+   struct Lisp_Hash_Table *h = XHASH_TABLE (Vmodule_refs_hash);
+   Lisp_Object new_obj = value_to_lisp (value), hashcode;
+-  ptrdiff_t i = hash_lookup (h, new_obj, &hashcode);
++  ptrdiff_t i = lisp_hash_lookup (h, new_obj, &hashcode);
+ 
+   /* Note: This approach requires the garbage collector to never move
+      objects.  */
+@@ -463,7 +463,7 @@ module_free_global_ref (emacs_env *env, emacs_value global_value)
+   MODULE_FUNCTION_BEGIN ();
+   struct Lisp_Hash_Table *h = XHASH_TABLE (Vmodule_refs_hash);
+   Lisp_Object obj = value_to_lisp (global_value);
+-  ptrdiff_t i = hash_lookup (h, obj, NULL);
++  ptrdiff_t i = lisp_hash_lookup (h, obj, NULL);
+ 
+   if (module_assertions)
+     {
+diff --git a/src/fns.c b/src/fns.c
+index eeb65cadf3..c29d0bb658 100644
+--- a/src/fns.c
++++ b/src/fns.c
+@@ -2730,7 +2730,7 @@ internal_equal (Lisp_Object o1, Lisp_Object o2, enum equal_kind equal_kind,
+ 	  {
+ 	    struct Lisp_Hash_Table *h = XHASH_TABLE (ht);
+ 	    Lisp_Object hash;
+-	    ptrdiff_t i = hash_lookup (h, o1, &hash);
++	    ptrdiff_t i = lisp_hash_lookup (h, o1, &hash);
+ 	    if (i >= 0)
+ 	      { /* `o1' was seen already.  */
+ 		Lisp_Object o2s = HASH_VALUE (h, i);
+@@ -4678,7 +4678,7 @@ hash_table_rehash (Lisp_Object hash)
+    matching KEY, or -1 if not found.  */
+ 
+ ptrdiff_t
+-hash_lookup (struct Lisp_Hash_Table *h, Lisp_Object key, Lisp_Object *hash)
++lisp_hash_lookup (struct Lisp_Hash_Table *h, Lisp_Object key, Lisp_Object *hash)
+ {
+   ptrdiff_t start_of_bucket, i;
+ 
+@@ -4928,7 +4928,7 @@ #define SXHASH_MAX_LEN   7
+    can be any EMACS_UINT value.  */
+ 
+ EMACS_UINT
+-hash_string (char const *ptr, ptrdiff_t len)
++lisp_hash_string (char const *ptr, ptrdiff_t len)
+ {
+   char const *p   = ptr;
+   char const *end = ptr + len;
+@@ -4964,7 +4964,7 @@ hash_string (char const *ptr, ptrdiff_t len)
+ static EMACS_UINT
+ sxhash_string (char const *ptr, ptrdiff_t len)
+ {
+-  EMACS_UINT hash = hash_string (ptr, len);
++  EMACS_UINT hash = lisp_hash_string (ptr, len);
+   return SXHASH_REDUCE (hash);
+ }
+ 
+@@ -5430,7 +5430,7 @@ DEFUN ("gethash", Fgethash, Sgethash, 2, 3, 0,
+   (Lisp_Object key, Lisp_Object table, Lisp_Object dflt)
+ {
+   struct Lisp_Hash_Table *h = check_hash_table (table);
+-  ptrdiff_t i = hash_lookup (h, key, NULL);
++  ptrdiff_t i = lisp_hash_lookup (h, key, NULL);
+   return i >= 0 ? HASH_VALUE (h, i) : dflt;
+ }
+ 
+@@ -5445,7 +5445,7 @@ DEFUN ("puthash", Fputhash, Sputhash, 3, 3, 0,
+   check_mutable_hash_table (table, h);
+ 
+   Lisp_Object hash;
+-  ptrdiff_t i = hash_lookup (h, key, &hash);
++  ptrdiff_t i = lisp_hash_lookup (h, key, &hash);
+   if (i >= 0)
+     set_hash_value_slot (h, i, value);
+   else
+diff --git a/src/haiku_font_support.cc b/src/haiku_font_support.cc
+index 9a2492c9a1..2e29ff3130 100644
+--- a/src/haiku_font_support.cc
++++ b/src/haiku_font_support.cc
+@@ -121,7 +121,7 @@ cache_font_object_data (const char *family, const char *style,
+   uint32_t hash;
+   struct font_object_cache_bucket *bucket, *next;
+ 
+-  hash = hash_string (family) ^ hash_string (style);
++  hash = lisp_hash_string (family) ^ lisp_hash_string (style);
+   bucket = font_object_cache[hash % 2048];
+ 
+   for (next = bucket; next; next = next->next)
+@@ -149,7 +149,7 @@ lookup_font_object_data (const char *family, const char *style)
+   uint32_t hash;
+   struct font_object_cache_bucket *bucket, *next;
+ 
+-  hash = hash_string (family) ^ hash_string (style);
++  hash = lisp_hash_string (family) ^ lisp_hash_string (style);
+   bucket = font_object_cache[hash % 2048];
+ 
+   for (next = bucket; next; next = next->next)
+diff --git a/src/image.c b/src/image.c
+index b881e43e95..12703252c6 100644
+--- a/src/image.c
++++ b/src/image.c
+@@ -4795,7 +4795,7 @@ xpm_free_color_cache (void)
+ static int
+ xpm_color_bucket (char *color_name)
+ {
+-  EMACS_UINT hash = hash_string (color_name, strlen (color_name));
++  EMACS_UINT hash = lisp_hash_string (color_name, strlen (color_name));
+   return hash % XPM_COLOR_CACHE_BUCKETS;
+ }
+ 
+@@ -5481,7 +5481,7 @@ xpm_put_color_table_h (Lisp_Object color_table,
+   struct Lisp_Hash_Table *table = XHASH_TABLE (color_table);
+   Lisp_Object chars = make_unibyte_string (chars_start, chars_len), hash_code;
+ 
+-  hash_lookup (table, chars, &hash_code);
++  lisp_hash_lookup (table, chars, &hash_code);
+   hash_put (table, chars, color, hash_code);
+ }
+ 
+@@ -5492,7 +5492,7 @@ xpm_get_color_table_h (Lisp_Object color_table,
+ {
+   struct Lisp_Hash_Table *table = XHASH_TABLE (color_table);
+   ptrdiff_t i =
+-    hash_lookup (table, make_unibyte_string (chars_start, chars_len), NULL);
++    lisp_hash_lookup (table, make_unibyte_string (chars_start, chars_len), NULL);
+ 
+   return i >= 0 ? HASH_VALUE (table, i) : Qnil;
+ }
+diff --git a/src/json.c b/src/json.c
+index cdcc11358e..55c67b9c2f 100644
+--- a/src/json.c
++++ b/src/json.c
+@@ -864,7 +864,7 @@ json_to_lisp (json_t *json, const struct json_configuration *conf)
+               json_object_foreach (json, key_str, value)
+                 {
+ 		  Lisp_Object key = build_string_from_utf8 (key_str), hash;
+-                  ptrdiff_t i = hash_lookup (h, key, &hash);
++                  ptrdiff_t i = lisp_hash_lookup (h, key, &hash);
+                   /* Keys in JSON objects are unique, so the key can't
+                      be present yet.  */
+                   eassert (i < 0);
+diff --git a/src/lisp.h b/src/lisp.h
+index be511a0eb9..c26859a2be 100644
+--- a/src/lisp.h
++++ b/src/lisp.h
+@@ -4018,12 +4018,12 @@ #define CONS_TO_INTEGER(cons, type, var)				\
+ extern bool sweep_weak_table (struct Lisp_Hash_Table *, bool);
+ extern void hexbuf_digest (char *, void const *, int);
+ extern char *extract_data_from_object (Lisp_Object, ptrdiff_t *, ptrdiff_t *);
+-EMACS_UINT hash_string (char const *, ptrdiff_t);
++EMACS_UINT lisp_hash_string (char const *, ptrdiff_t);
+ EMACS_UINT sxhash (Lisp_Object);
+ Lisp_Object hashfn_user_defined (Lisp_Object, struct Lisp_Hash_Table *);
+ Lisp_Object make_hash_table (struct hash_table_test, EMACS_INT, float, float,
+                              Lisp_Object, bool);
+-ptrdiff_t hash_lookup (struct Lisp_Hash_Table *, Lisp_Object, Lisp_Object *);
++ptrdiff_t lisp_hash_lookup (struct Lisp_Hash_Table *, Lisp_Object, Lisp_Object *);
+ ptrdiff_t hash_put (struct Lisp_Hash_Table *, Lisp_Object, Lisp_Object,
+ 		    Lisp_Object);
+ void hash_remove_from_table (struct Lisp_Hash_Table *, Lisp_Object);
+diff --git a/src/lread.c b/src/lread.c
+index d838a18de5..523ed595a5 100644
+--- a/src/lread.c
++++ b/src/lread.c
+@@ -4008,7 +4008,7 @@ read0 (Lisp_Object readcharfun, bool locate_syms)
+ 			  = XHASH_TABLE (read_objects_map);
+ 			Lisp_Object number = make_fixnum (n);
+ 			Lisp_Object hash;
+-			ptrdiff_t i = hash_lookup (h, number, &hash);
++			ptrdiff_t i = lisp_hash_lookup (h, number, &hash);
+ 			if (i >= 0)
+ 			  /* Not normal, but input could be malformed.  */
+ 			  set_hash_value_slot (h, i, placeholder);
+@@ -4026,7 +4026,7 @@ read0 (Lisp_Object readcharfun, bool locate_syms)
+ 			/* #N# -- reference to numbered object */
+ 			struct Lisp_Hash_Table *h
+ 			  = XHASH_TABLE (read_objects_map);
+-			ptrdiff_t i = hash_lookup (h, make_fixnum (n), NULL);
++			ptrdiff_t i = lisp_hash_lookup (h, make_fixnum (n), NULL);
+ 			if (i < 0)
+ 			  invalid_syntax ("#", readcharfun);
+ 			obj = HASH_VALUE (h, i);
+@@ -4324,7 +4324,7 @@ read0 (Lisp_Object readcharfun, bool locate_syms)
+ 		struct Lisp_Hash_Table *h2
+ 		  = XHASH_TABLE (read_objects_completed);
+ 		Lisp_Object hash;
+-		ptrdiff_t i = hash_lookup (h2, placeholder, &hash);
++		ptrdiff_t i = lisp_hash_lookup (h2, placeholder, &hash);
+ 		eassert (i < 0);
+ 		hash_put (h2, placeholder, Qnil, hash);
+ 		obj = placeholder;
+@@ -4339,7 +4339,7 @@ read0 (Lisp_Object readcharfun, bool locate_syms)
+ 		    struct Lisp_Hash_Table *h2
+ 		      = XHASH_TABLE (read_objects_completed);
+ 		    Lisp_Object hash;
+-		    ptrdiff_t i = hash_lookup (h2, obj, &hash);
++		    ptrdiff_t i = lisp_hash_lookup (h2, obj, &hash);
+ 		    eassert (i < 0);
+ 		    hash_put (h2, obj, Qnil, hash);
+ 		  }
+@@ -4351,7 +4351,7 @@ read0 (Lisp_Object readcharfun, bool locate_syms)
+ 		/* ...and #n# will use the real value from now on.  */
+ 		struct Lisp_Hash_Table *h = XHASH_TABLE (read_objects_map);
+ 		Lisp_Object hash;
+-		ptrdiff_t i = hash_lookup (h, e->u.numbered.number, &hash);
++		ptrdiff_t i = lisp_hash_lookup (h, e->u.numbered.number, &hash);
+ 		eassert (i >= 0);
+ 		set_hash_value_slot (h, i, obj);
+ 	      }
+@@ -4405,7 +4405,7 @@ substitute_object_recurse (struct subst *subst, Lisp_Object subtree)
+      by #n=, which means that we can find it as a value in
+      COMPLETED.  */
+   if (EQ (subst->completed, Qt)
+-      || hash_lookup (XHASH_TABLE (subst->completed), subtree, NULL) >= 0)
++      || lisp_hash_lookup (XHASH_TABLE (subst->completed), subtree, NULL) >= 0)
+     subst->seen = Fcons (subtree, subst->seen);
+ 
+   /* Recurse according to subtree's type.
+@@ -4900,7 +4900,7 @@ oblookup (Lisp_Object obarray, register const char *ptr, ptrdiff_t size, ptrdiff
+   obarray = check_obarray (obarray);
+   /* This is sometimes needed in the middle of GC.  */
+   obsize = gc_asize (obarray);
+-  hash = hash_string (ptr, size_byte) % obsize;
++  hash = lisp_hash_string (ptr, size_byte) % obsize;
+   bucket = AREF (obarray, hash);
+   oblookup_last_bucket_number = hash;
+   if (BASE_EQ (bucket, make_fixnum (0)))
+diff --git a/src/macfont.m b/src/macfont.m
+index 4de056cb36..8b1527cf60 100644
+--- a/src/macfont.m
++++ b/src/macfont.m
+@@ -983,7 +983,7 @@ static void mac_font_get_glyphs_for_variants (CFDataRef, UTF32Char,
+   if (HASH_TABLE_P (macfont_family_cache))
+     {
+       struct Lisp_Hash_Table *h = XHASH_TABLE (macfont_family_cache);
+-      ptrdiff_t i = hash_lookup (h, symbol, NULL);
++      ptrdiff_t i = lisp_hash_lookup (h, symbol, NULL);
+ 
+       if (i >= 0)
+ 	{
+@@ -1009,7 +1009,7 @@ static void mac_font_get_glyphs_for_variants (CFDataRef, UTF32Char,
+     macfont_family_cache = CALLN (Fmake_hash_table, QCtest, Qeq);
+ 
+   h = XHASH_TABLE (macfont_family_cache);
+-  i = hash_lookup (h, symbol, &hash);
++  i = lisp_hash_lookup (h, symbol, &hash);
+   value = string ? make_mint_ptr ((void *) CFRetain (string)) : Qnil;
+   if (i >= 0)
+     {
+diff --git a/src/minibuf.c b/src/minibuf.c
+index 3f34b1b083..1a892d6787 100644
+--- a/src/minibuf.c
++++ b/src/minibuf.c
+@@ -2110,7 +2110,7 @@ DEFUN ("test-completion", Ftest_completion, Stest_completion, 2, 3, 0,
+   else if (HASH_TABLE_P (collection))
+     {
+       struct Lisp_Hash_Table *h = XHASH_TABLE (collection);
+-      i = hash_lookup (h, string, NULL);
++      i = lisp_hash_lookup (h, string, NULL);
+       if (i >= 0)
+         {
+           tem = HASH_KEY (h, i);
+diff --git a/src/profiler.c b/src/profiler.c
+index 5cb42d54fa..6a7eb49768 100644
+--- a/src/profiler.c
++++ b/src/profiler.c
+@@ -166,7 +166,7 @@ record_backtrace (log_t *log, EMACS_INT count)
+        handler, and we optimize the code to try and avoid computing the
+        hash+lookup twice.  See fns.c:Fputhash for reference.  */
+     Lisp_Object hash;
+-    ptrdiff_t j = hash_lookup (log, backtrace, &hash);
++    ptrdiff_t j = lisp_hash_lookup (log, backtrace, &hash);
+     if (j >= 0)
+       {
+ 	EMACS_INT old_val = XFIXNUM (HASH_VALUE (log, j));
